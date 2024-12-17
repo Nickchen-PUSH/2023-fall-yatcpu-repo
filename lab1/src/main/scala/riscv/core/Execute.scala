@@ -48,8 +48,24 @@ class Execute extends Module {
 
   // lab1(Execute)
 
-
-
+  alu.io.op1 := MuxLookup(
+    io.aluop1_source,
+    0.U,
+    IndexedSeq(
+      ALUOp1Source.InstructionAddress -> io.instruction_address,
+      ALUOp1Source.Register -> io.reg1_data
+    )
+  )
+  alu.io.op2 := MuxLookup(
+    io.aluop2_source,
+    0.U,
+    IndexedSeq(
+      ALUOp2Source.Immediate -> io.immediate,
+      ALUOp2Source.Register -> io.reg2_data
+    )
+  )
+  
+  alu.io.func := alu_ctrl.io.alu_funct
 
 
 

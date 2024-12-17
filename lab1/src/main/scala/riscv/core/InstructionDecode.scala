@@ -179,11 +179,35 @@ class InstructionDecode extends Module {
 
   // lab1(InstructionDecode)
 
+  io.ex_aluop2_source := Mux(
+    opcode === InstructionTypes.RM,
+    ALUOp2Source.Register,
+    ALUOp2Source.Immediate
+    
+  )
 
+  io.memory_read_enable := opcode === InstructionTypes.L
 
+  io.memory_write_enable := opcode === InstructionTypes.S
 
+  // io.wb_reg_write_source := Mux(
+  //   opcode === Instructions.lui || opcode === Instructions.auipc || opcode === Instructions.jal || opcode === Instructions.jalr || opcode === InstructionTypes.I || opcode === InstructionTypes.RM,
+  //   RegWriteSource.ALUResult,
+  //   RegWriteSource.Memory
+  // )
 
-
+  io.wb_reg_write_source := MuxLookup(
+    opcode,
+    RegWriteSource.Memory,
+    IndexedSeq(
+      Instructions.lui -> RegWriteSource.ALUResult,
+      Instructions.auipc -> RegWriteSource.ALUResult,
+      Instructions.jal -> RegWriteSource.NextInstructionAddress,
+      Instructions.jalr -> RegWriteSource.NextInstructionAddress,
+      InstructionTypes.I -> RegWriteSource.ALUResult,
+      InstructionTypes.RM -> RegWriteSource.ALUResult
+    )
+  )
 
   // lab1(InstructionDecode) end
   io.reg_write_enable := (opcode === InstructionTypes.RM) || (opcode === InstructionTypes.I) ||

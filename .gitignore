@@ -11,3 +11,8 @@ target
 **/hello_z710-test
 **/riscv-z710-v2020
 .Xil
+
+docs
+
+bin
+yatcpu/lib64
