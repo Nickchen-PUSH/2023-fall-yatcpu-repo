@@ -24,12 +24,12 @@ class ExecuteTest extends AnyFlatSpec with ChiselScalatestTester{
   behavior of "CLINTCSRTest of Single Cycle CPU"
   it should "produce correct data for csr write" in {
     test(new Execute).withAnnotations(TestAnnotations.annos) { c =>
-      c.io.instruction.poke(0x30047073L.U) // csrc mstatus,3
+      c.io.instruction.poke(0x30047073L.U) // csrci mstatus,4
       c.io.csr_reg_read_data.poke(0x1888L.U)
       c.io.reg1_data.poke(0x1880L.U)
       c.io.csr_reg_write_data.expect(0x1880.U)
       c.clock.step()
-      c.io.instruction.poke(0x30046073L.U) //csrs mastatus,3
+      c.io.instruction.poke(0x30046073L.U) //csrsi mastatus,4
       c.io.csr_reg_read_data.poke(0x1880L.U)
       c.io.reg1_data.poke(0x1880L.U)
       c.io.csr_reg_write_data.expect(0x1888.U)

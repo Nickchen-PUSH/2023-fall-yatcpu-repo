@@ -104,4 +104,38 @@ class CLINT extends Module {
     io.interrupt_handler_address :=
   }
    */
+  val mstatus_disable_interrupt = io.csr_bundle.mstatus(31, 4) ## 0.U(1.W) ## io.csr_bundle.mstatus(2, 0)
+  val mstatus_recover_interrupt = io.csr_bundle.mstatus(31, 4) ## io.csr_bundle.mstatus(7) ## io.csr_bundle.mstatus(2, 0)
+
+  when(io.interrupt_flag === 1.U && interrupt_enable) {
+    io.csr_bundle.mstatus_write_data := mstatus_disable_interrupt
+    io.csr_bundle.mepc_write_data := instruction_address
+    io.csr_bundle.mcause_write_data := 0x80000007L.U
+    io.csr_bundle.direct_write_enable := true.B
+    io.interrupt_assert := true.B
+    io.interrupt_handler_address := io.csr_bundle.mtvec
+  }.elsewhen(io.interrupt_flag === 2.U) {
+    io.csr_bundle.mstatus_write_data := mstatus_disable_interrupt
+    io.csr_bundle.mepc_write_data := instruction_address
+    io.csr_bundle.mcause_write_data := 0x8000000BL.U
+    io.csr_bundle.direct_write_enable := true.B
+    io.interrupt_assert := true.B
+    io.interrupt_handler_address := io.csr_bundle.mtvec
+  }.elsewhen( io.instruction === InstructionsRet.mret){
+    io.csr_bundle.mstatus_write_data := mstatus_recover_interrupt
+    io.csr_bundle.mepc_write_data := io.csr_bundle.mepc
+    io.csr_bundle.mcause_write_data := io.csr_bundle.mcause
+    io.csr_bundle.direct_write_enable := true.B
+    io.interrupt_assert := true.B
+    io.interrupt_handler_address := io.csr_bundle.mepc
+  }.otherwise {
+    io.csr_bundle.mstatus_write_data := io.csr_bundle.mstatus
+    io.csr_bundle.mepc_write_data := io.csr_bundle.mepc
+    io.csr_bundle.mcause_write_data := io.csr_bundle.mcause
+    io.csr_bundle.direct_write_enable := false.B
+    io.interrupt_assert := false.B
+    io.interrupt_handler_address := instruction_address
+  }
+
+  
 }

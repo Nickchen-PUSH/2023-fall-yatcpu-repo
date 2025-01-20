@@ -18,7 +18,6 @@ import chisel3._
 import chisel3.util._
 import riscv.Parameters
 
-
 object CSRRegister {
   // Refer to Spec. Vol.II Page 8-10
   val MSTATUS = 0x300.U(Parameters.CSRRegisterAddrWidth)
@@ -34,9 +33,9 @@ object CSRRegister {
 class CSR extends Module {
   val io = IO(new Bundle {
     val reg_read_address_id = Input(UInt(Parameters.CSRRegisterAddrWidth))
-    val reg_write_enable_id= Input(Bool())
+    val reg_write_enable_id = Input(Bool())
     val reg_write_address_id = Input(UInt(Parameters.CSRRegisterAddrWidth))
-    val reg_write_data_ex= Input(UInt(Parameters.DataWidth))
+    val reg_write_data_ex = Input(UInt(Parameters.DataWidth))
     val debug_reg_read_address = Input(UInt(Parameters.CSRRegisterAddrWidth))
 
     val debug_reg_read_data = Output(UInt(Parameters.DataWidth))
@@ -61,23 +60,43 @@ class CSR extends Module {
       CSRRegister.MEPC -> mepc,
       CSRRegister.MCAUSE -> mcause,
       CSRRegister.CycleL -> cycles(31, 0),
-      CSRRegister.CycleH -> cycles(63, 32),
+      CSRRegister.CycleH -> cycles(63, 32)
     )
   cycles := cycles + 1.U
 
   // If the pipeline and the CLINT are going to read and write the CSR at the same time, let the pipeline write first.
   // This is implemented in a single cycle by passing reg_write_data_ex to clint and writing the data from the CLINT to the CSR.
   io.reg_read_data := MuxLookup(io.reg_read_address_id, 0.U, regLUT)
-  io.debug_reg_read_data := MuxLookup(io.debug_reg_read_address, 0.U,regLUT)
+  io.debug_reg_read_data := MuxLookup(io.debug_reg_read_address, 0.U, regLUT)
 
-  //lab2(CLINTCSR)
-  //what data should be passed from csr to clint (Note: what should clint see is the next state of the CPU)
+  // lab2(CLINTCSR)
+  // what data should be passed from csr to clint (Note: what should clint see is the next state of the CPU)
   /*
   io.clint_access_bundle.mstatus :=
   io.clint_access_bundle.mtvec :=
   io.clint_access_bundle.mcause :=
   io.clint_access_bundle.mepc :=
-  */
+   */
+  io.clint_access_bundle.mstatus := Mux(
+    io.reg_write_enable_id && io.reg_write_address_id === CSRRegister.MSTATUS,
+    io.reg_write_data_ex,
+    mstatus
+  )
+  io.clint_access_bundle.mtvec := Mux(
+    io.reg_write_enable_id && io.reg_write_address_id === CSRRegister.MTVEC,
+    io.reg_write_data_ex,
+    mtvec
+  )
+  io.clint_access_bundle.mcause := Mux(
+    io.reg_write_enable_id && io.reg_write_address_id === CSRRegister.MCAUSE,
+    io.reg_write_data_ex,
+    mcause
+  )
+  io.clint_access_bundle.mepc := Mux(
+    io.reg_write_enable_id && io.reg_write_address_id === CSRRegister.MEPC,
+    io.reg_write_data_ex,
+    mepc
+  )
 
   when(io.clint_access_bundle.direct_write_enable) {
     mstatus := io.clint_access_bundle.mstatus_write_data
@@ -96,12 +115,41 @@ class CSR extends Module {
   when(io.reg_write_enable_id) {
     when(io.reg_write_address_id === CSRRegister.MIE) {
       mie := io.reg_write_data_ex
-    }.elsewhen(io.reg_write_address_id === CSRRegister.MTVEC){
+    }.elsewhen(io.reg_write_address_id === CSRRegister.MTVEC) {
       mtvec := io.reg_write_data_ex
     }.elsewhen(io.reg_write_address_id === CSRRegister.MSCRATCH) {
       mscratch := io.reg_write_data_ex
     }
   }
 
+  io.reg_read_data := MuxLookup(
+    io.reg_read_address_id,
+    0.U,
+    IndexedSeq(
+      CSRRegister.MSTATUS -> mstatus,
+      CSRRegister.MIE -> mie,
+      CSRRegister.MTVEC -> mtvec,
+      CSRRegister.MSCRATCH -> mscratch,
+      CSRRegister.MEPC -> mepc,
+      CSRRegister.MCAUSE -> mcause,
+      CSRRegister.CycleL -> cycles(31, 0),
+      CSRRegister.CycleH -> cycles(63, 32)
+    )
+  )
+
+  io.debug_reg_read_data := MuxLookup(
+    io.debug_reg_read_address,
+    0.U,
+    IndexedSeq(
+      CSRRegister.MSTATUS -> mstatus,
+      CSRRegister.MIE -> mie,
+      CSRRegister.MTVEC -> mtvec,
+      CSRRegister.MSCRATCH -> mscratch,
+      CSRRegister.MEPC -> mepc,
+      CSRRegister.MCAUSE -> mcause,
+      CSRRegister.CycleL -> cycles(31, 0),
+      CSRRegister.CycleH -> cycles(63, 32)
+    )
+  )
 
 }

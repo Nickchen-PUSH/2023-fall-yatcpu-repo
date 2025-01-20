@@ -76,4 +76,19 @@ class Execute extends Module {
   /*
   io.csr_reg_write_data :=
   */
+  val uimm5 = io.instruction(19, 15)
+
+  io.csr_reg_write_data := MuxLookup(
+    funct3,
+    io.csr_reg_read_data,
+    IndexedSeq(
+      InstructionsTypeCSR.csrrw -> io.reg1_data,
+      InstructionsTypeCSR.csrrc -> (io.csr_reg_read_data & (~io.reg1_data).asUInt),
+      InstructionsTypeCSR.csrrs -> (io.csr_reg_read_data | io.reg1_data),
+      InstructionsTypeCSR.csrrwi -> (0.U(27.W) ## uimm5),
+      InstructionsTypeCSR.csrrci -> (io.csr_reg_read_data & (~(0.U(27.W) ## uimm5)).asUInt),
+      InstructionsTypeCSR.csrrsi -> (io.csr_reg_read_data | 0.U(27.W) ## uimm5),
+    )
+  )
+
 }

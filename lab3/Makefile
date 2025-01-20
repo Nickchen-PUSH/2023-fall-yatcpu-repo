@@ -59,3 +59,4 @@ vivado-sim-z710: z710
 	cd vivado/z710 && vivado -mode batch -source run_simulation.tcl
 
 .PHONY: basys3 verilator z710 test bitstream program verilator-sim vivado-sim
+	

@@ -16,3 +16,13 @@ docs
 
 bin
 yatcpu/lib64
+
+*.xpr
+*.v
+*.fir
+*.vhdl
+*.vhd
+*.wdf
+*/vivado/*
+*/verilog/*
+*.sbt
