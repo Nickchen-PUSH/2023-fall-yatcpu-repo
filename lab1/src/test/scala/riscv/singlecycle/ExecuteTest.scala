@@ -27,9 +27,9 @@ class ExecuteTest extends AnyFlatSpec with ChiselScalatestTester{
 
       // add test
       c.io.instruction.poke(0x001101b3L.U) //x3 =  x2 + x1
-      //c.io.immediate.poke(0.U)
-      //c.io.aluop1_source.poke(0.U)
-      //c.io.aluop2_source.poke(0.U)
+      c.io.immediate.poke(0.U)
+      c.io.aluop1_source.poke(0.U)
+      c.io.aluop2_source.poke(0.U)
 
       var x = 0
       for (x <- 0 to 100) {
@@ -55,6 +55,8 @@ class ExecuteTest extends AnyFlatSpec with ChiselScalatestTester{
       c.clock.step()
 
       // equ
+      // c.io.aluop1_source.poke(0.U)
+      // c.io.aluop2_source.poke(0.U)
       c.io.reg1_data.poke(9.U)
       c.io.reg2_data.poke(9.U)
       c.clock.step()//add

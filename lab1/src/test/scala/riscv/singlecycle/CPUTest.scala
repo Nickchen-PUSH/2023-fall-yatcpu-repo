@@ -116,10 +116,17 @@ class ByteAccessTest extends AnyFlatSpec with ChiselScalatestTester {
       }
       c.io.regs_debug_read_address.poke(5.U)
       c.io.regs_debug_read_data.expect(0xDEADBEEFL.U)
+      c.clock.step(10)
       c.io.regs_debug_read_address.poke(6.U)
       c.io.regs_debug_read_data.expect(0xEF.U)
+      c.clock.step(10)
       c.io.regs_debug_read_address.poke(1.U)
       c.io.regs_debug_read_data.expect(0x15EF.U)
+      c.clock.step(10)
+      c.io.mem_debug_read_address.poke(4.U)
+      c.clock.step(10)
+      c.io.mem_debug_read_address.poke(5.U)
+      c.clock.step(10)
     }
   }
 }

@@ -1,0 +1,16 @@
+
+/workspaces/2023-fall-yatcpu-repo/lab3/src/main/resources/sb.asmbin:     file format binary
+
+
+Disassembly of section .data:
+
+0000000000000000 <.data>:
+   0:	00400513          	li	a0,4
+   4:	deadc2b7          	lui	t0,0xdeadc
+   8:	eef28293          	addi	t0,t0,-273 # 0xffffffffdeadbeef
+   c:	00550023          	sb	t0,0(a0)
+  10:	00052303          	lw	t1,0(a0)
+  14:	01500913          	li	s2,21
+  18:	012500a3          	sb	s2,1(a0)
+  1c:	00052083          	lw	ra,0(a0)
+  20:	0000006f          	j	0x20

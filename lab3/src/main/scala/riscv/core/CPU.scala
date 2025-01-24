@@ -21,7 +21,7 @@ import riscv.core.fivestage_forward.{CPU => FiveStageCPUForward}
 import riscv.core.fivestage_stall.{CPU => FiveStageCPUStall}
 import riscv.core.threestage.{CPU => ThreeStageCPU}
 
-class CPU(val implementation: Int = ImplementationType.FiveStageFinal) extends Module {
+class CPU(val implementation: Int = ImplementationType.FiveStageForward) extends Module {
   val io = IO(new CPUBundle)
   implementation match {
     case ImplementationType.ThreeStage =>

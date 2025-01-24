@@ -45,5 +45,31 @@ class Forwarding extends Module {
   io.reg2_forward_id := 0.U
   io.reg1_forward_ex := 0.U
   io.reg2_forward_ex := 0.U
+  
+  when(io.rs1_id =/= 0.U && io.rs1_id === io.rd_mem && io.reg_write_enable_mem) {
+    io.reg1_forward_id := ForwardingType.ForwardFromMEM
+  }.elsewhen(io.rs1_id =/= 0.U && io.rs1_id === io.rd_wb && io.reg_write_enable_wb) {
+    io.reg1_forward_id := ForwardingType.ForwardFromWB
+  }
+  when(io.rs2_id =/= 0.U && io.rs2_id === io.rd_mem && io.reg_write_enable_mem) {
+    io.reg2_forward_id := ForwardingType.ForwardFromMEM
+  }.elsewhen(io.rs2_id =/= 0.U && io.rs2_id === io.rd_wb && io.reg_write_enable_wb) {
+    io.reg2_forward_id := ForwardingType.ForwardFromWB
+  }
+
+
+
+  when(io.rs1_ex =/= 0.U && io.rs1_ex === io.rd_mem && io.reg_write_enable_mem) {
+    io.reg1_forward_ex := ForwardingType.ForwardFromMEM
+  }.elsewhen(io.rs1_ex =/= 0.U && io.rs1_ex === io.rd_wb && io.reg_write_enable_wb) {
+    io.reg1_forward_ex := ForwardingType.ForwardFromWB
+  }
+
+  when(io.rs2_ex =/= 0.U && io.rs2_ex === io.rd_mem && io.reg_write_enable_mem) {
+    io.reg2_forward_ex := ForwardingType.ForwardFromMEM
+  }.elsewhen(io.rs2_ex =/= 0.U && io.rs2_ex === io.rd_wb && io.reg_write_enable_wb) {
+    io.reg2_forward_ex := ForwardingType.ForwardFromWB
+  }
+
   // Lab3(Final) End
 }

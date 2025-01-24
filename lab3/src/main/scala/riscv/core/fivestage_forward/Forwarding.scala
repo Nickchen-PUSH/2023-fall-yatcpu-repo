@@ -38,7 +38,22 @@ class Forwarding extends Module {
   })
 
   // Lab3(Forward)
-  io.reg1_forward_ex := 0.U
-  io.reg2_forward_ex := 0.U
+  when(io.rs1_ex =/= 0.U && io.rs1_ex === io.rd_mem && io.reg_write_enable_mem) {
+    io.reg1_forward_ex := ForwardingType.ForwardFromMEM
+  }.elsewhen(io.rs1_ex =/= 0.U && io.rs1_ex === io.rd_wb && io.reg_write_enable_wb) {
+    io.reg1_forward_ex := ForwardingType.ForwardFromWB
+  }.otherwise {
+    io.reg1_forward_ex := ForwardingType.NoForward
+  }
+
+  when(io.rs2_ex =/= 0.U && io.rs2_ex === io.rd_mem && io.reg_write_enable_mem) {
+    io.reg2_forward_ex := ForwardingType.ForwardFromMEM
+  }.elsewhen(io.rs2_ex =/= 0.U && io.rs2_ex === io.rd_wb && io.reg_write_enable_wb) {
+    io.reg2_forward_ex := ForwardingType.ForwardFromWB
+  }.otherwise {
+    io.reg2_forward_ex := ForwardingType.NoForward
+  }
+
+
   // Lab3(Forward) End
 }

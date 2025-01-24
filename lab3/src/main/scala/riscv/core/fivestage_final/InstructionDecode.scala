@@ -17,6 +17,8 @@ package riscv.core.fivestage_final
 import chisel3._
 import chisel3.util._
 import riscv.Parameters
+import riscv.core.ALU
+import riscv.core.ALUFunctions
 
 object InstructionTypes {
   val L = "b0000011".U
@@ -145,8 +147,10 @@ class InstructionDecode extends Module {
     val interrupt_assert = Input(Bool())
     val interrupt_handler_address = Input(UInt(Parameters.AddrWidth))
 
-    val regs_reg1_read_address = Output(UInt(Parameters.PhysicalRegisterAddrWidth))
-    val regs_reg2_read_address = Output(UInt(Parameters.PhysicalRegisterAddrWidth))
+    val regs_reg1_read_address =
+      Output(UInt(Parameters.PhysicalRegisterAddrWidth))
+    val regs_reg2_read_address =
+      Output(UInt(Parameters.PhysicalRegisterAddrWidth))
     val ex_immediate = Output(UInt(Parameters.DataWidth))
     val ex_aluop1_source = Output(UInt(1.W))
     val ex_aluop2_source = Output(UInt(1.W))
@@ -154,7 +158,8 @@ class InstructionDecode extends Module {
     val ex_memory_write_enable = Output(Bool())
     val ex_reg_write_source = Output(UInt(2.W))
     val ex_reg_write_enable = Output(Bool())
-    val ex_reg_write_address = Output(UInt(Parameters.PhysicalRegisterAddrWidth))
+    val ex_reg_write_address =
+      Output(UInt(Parameters.PhysicalRegisterAddrWidth))
     val ex_csr_address = Output(UInt(Parameters.CSRRegisterAddrWidth))
     val ex_csr_write_enable = Output(Bool())
     val ctrl_jump_instruction = Output(Bool())
@@ -170,20 +175,49 @@ class InstructionDecode extends Module {
   val rs1 = io.instruction(19, 15)
   val rs2 = io.instruction(24, 20)
 
-  io.regs_reg1_read_address := Mux(opcode === Instructions.lui, 0.U(Parameters.PhysicalRegisterAddrWidth), rs1)
+  io.regs_reg1_read_address := Mux(
+    opcode === Instructions.lui,
+    0.U(Parameters.PhysicalRegisterAddrWidth),
+    rs1
+  )
   io.regs_reg2_read_address := rs2
   io.ex_immediate := MuxLookup(
     opcode,
     Cat(Fill(20, io.instruction(31)), io.instruction(31, 20)),
     IndexedSeq(
-      InstructionTypes.I -> Cat(Fill(21, io.instruction(31)), io.instruction(30, 20)),
-      InstructionTypes.L -> Cat(Fill(21, io.instruction(31)), io.instruction(30, 20)),
-      Instructions.jalr -> Cat(Fill(21, io.instruction(31)), io.instruction(30, 20)),
-      InstructionTypes.S -> Cat(Fill(21, io.instruction(31)), io.instruction(30, 25), io.instruction(11, 7)),
-      InstructionTypes.B -> Cat(Fill(20, io.instruction(31)), io.instruction(7), io.instruction(30, 25), io.instruction(11, 8), 0.U(1.W)),
+      InstructionTypes.I -> Cat(
+        Fill(21, io.instruction(31)),
+        io.instruction(30, 20)
+      ),
+      InstructionTypes.L -> Cat(
+        Fill(21, io.instruction(31)),
+        io.instruction(30, 20)
+      ),
+      Instructions.jalr -> Cat(
+        Fill(21, io.instruction(31)),
+        io.instruction(30, 20)
+      ),
+      InstructionTypes.S -> Cat(
+        Fill(21, io.instruction(31)),
+        io.instruction(30, 25),
+        io.instruction(11, 7)
+      ),
+      InstructionTypes.B -> Cat(
+        Fill(20, io.instruction(31)),
+        io.instruction(7),
+        io.instruction(30, 25),
+        io.instruction(11, 8),
+        0.U(1.W)
+      ),
       Instructions.lui -> Cat(io.instruction(31, 12), 0.U(12.W)),
       Instructions.auipc -> Cat(io.instruction(31, 12), 0.U(12.W)),
-      Instructions.jal -> Cat(Fill(12, io.instruction(31)), io.instruction(19, 12), io.instruction(20), io.instruction(30, 21), 0.U(1.W))
+      Instructions.jal -> Cat(
+        Fill(12, io.instruction(31)),
+        io.instruction(19, 12),
+        io.instruction(20),
+        io.instruction(30, 21),
+        0.U(1.W)
+      )
     )
   )
   io.ex_aluop1_source := Mux(
@@ -217,7 +251,7 @@ class InstructionDecode extends Module {
     funct3 === InstructionsTypeCSR.csrrw || funct3 === InstructionsTypeCSR.csrrwi ||
       funct3 === InstructionsTypeCSR.csrrs || funct3 === InstructionsTypeCSR.csrrsi ||
       funct3 === InstructionsTypeCSR.csrrc || funct3 === InstructionsTypeCSR.csrrci
-    )
+  )
 
   // Lab3(Final)
   io.ctrl_jump_instruction := false.B
@@ -225,5 +259,62 @@ class InstructionDecode extends Module {
   io.clint_jump_address := 0.U
   io.if_jump_flag := false.B
   io.if_jump_address := 0.U
+
+  val reg1_data = MuxLookup(
+    io.reg1_forward,
+    io.reg1_data,
+    IndexedSeq(
+      ForwardingType.ForwardFromMEM -> io.forward_from_mem,
+      ForwardingType.ForwardFromWB -> io.forward_from_wb
+    )
+  )
+
+  val reg2_data = MuxLookup(
+    io.reg2_forward,
+    io.reg2_data,
+    IndexedSeq(
+      ForwardingType.ForwardFromMEM -> io.forward_from_mem,
+      ForwardingType.ForwardFromWB -> io.forward_from_wb
+    )
+  )
+
+  val jmp_instruction =
+    (opcode === Instructions.jal) || (opcode === Instructions.jalr) || (opcode === InstructionTypes.B)
+
+  val jmp_flag =
+    (opcode === Instructions.jal) || (opcode === Instructions.jalr) || (opcode === InstructionTypes.B) && MuxLookup(
+      funct3,
+      false.B,
+      IndexedSeq(
+        InstructionsTypeB.beq -> (reg1_data === reg2_data),
+        InstructionsTypeB.bne -> (reg1_data =/= reg2_data),
+        InstructionsTypeB.blt -> (reg1_data.asSInt < reg2_data.asSInt),
+        InstructionsTypeB.bge -> (reg1_data.asSInt >= reg2_data.asSInt),
+        InstructionsTypeB.bltu -> (reg1_data < reg2_data),
+        InstructionsTypeB.bgeu -> (reg1_data >= reg2_data)
+      )
+    )
+  val instruct_type = MuxLookup(
+    opcode,
+    0.U,
+    IndexedSeq(
+      Instructions.nop -> 0.U,
+      Instructions.jal -> 1.U,
+      Instructions.jalr -> 2.U,
+      InstructionTypes.B -> 3.U
+    )
+  )
+  val jmp_address = Mux(opcode === Instructions.jalr, reg1_data + io.ex_immediate, io.instruction_address + io.ex_immediate)
+
+  io.clint_jump_flag := jmp_flag
+  io.clint_jump_address := jmp_address
+  io.if_jump_flag := jmp_flag
+  io.ctrl_jump_instruction := jmp_instruction
+    
+  io.if_jump_address := Mux(
+    io.interrupt_assert,
+    io.interrupt_handler_address,
+    jmp_address
+  )
   // Lab3(Final) End
 }

@@ -106,7 +106,7 @@ class CLINT extends Module {
    */
   val mstatus_disable_interrupt = io.csr_bundle.mstatus(31, 4) ## 0.U(1.W) ## io.csr_bundle.mstatus(2, 0)
   val mstatus_recover_interrupt = io.csr_bundle.mstatus(31, 4) ## io.csr_bundle.mstatus(7) ## io.csr_bundle.mstatus(2, 0)
-
+  InterruptStatus
   when(io.interrupt_flag === 1.U && interrupt_enable) {
     io.csr_bundle.mstatus_write_data := mstatus_disable_interrupt
     io.csr_bundle.mepc_write_data := instruction_address

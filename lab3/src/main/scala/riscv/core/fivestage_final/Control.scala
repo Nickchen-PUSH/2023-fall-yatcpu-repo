@@ -39,5 +39,44 @@ class Control extends Module {
   io.id_flush := false.B
   io.pc_stall := false.B
   io.if_stall := false.B
+  // val data_hazard = ((io.rs1_id === io.rd_ex || io.rs2_id === io.rd_ex) && io.memory_read_enable_ex && io.rd_ex =/= 0.U)
+  val data_hazard_ex =
+    ((io.rs1_id === io.rd_ex || io.rs2_id === io.rd_ex) && io.rd_ex =/= 0.U)
+  val data_hazard_mem =
+    ((io.rs1_id === io.rd_mem || io.rs2_id === io.rd_mem) && io.rd_mem =/= 0.U)
+
+  // when(data_hazard_ex && io.memory_read_enable_ex){
+  //   io.if_flush := false.B
+  //   io.id_flush := true.B
+  //   io.pc_stall := true.B
+  //   io.if_stall := true.B
+  // }.elsewhen(data_hazard_mem && io.memory_read_enable_mem && io.jump_instruction_id){
+  //   io.if_flush := false.B
+  //   io.id_flush := true.B
+  //   io.pc_stall := true.B
+  //   io.if_stall := true.B
+  // }.elsewhen(data_hazard_ex && io.jump_instruction_id){
+  //   io.if_flush := false.B
+  //   io.id_flush := true.B
+  //   io.pc_stall := true.B
+  //   io.if_stall := true.B
+  // }.elsewhen(io.jump_flag){
+  //   io.if_flush := true.B
+  //   io.id_flush := false.B
+  //   io.pc_stall := false.B
+  //   io.if_stall := false.B
+  // }.otherwise{
+  //   io.if_flush := false.B
+  //   io.id_flush := false.B
+  //   io.pc_stall := false.B
+  //   io.if_stall := false.B
+  // }
+  val stall_flag = ((io.memory_read_enable_ex || io.jump_instruction_id) && data_hazard_ex) ||
+    (io.jump_instruction_id && io.memory_read_enable_mem && data_hazard_mem) 
+  io.pc_stall := stall_flag
+  io.if_stall := stall_flag
+  io.id_flush := stall_flag
+  io.if_flush := !stall_flag && io.jump_flag
+  
   // Lab3(Final) End
 }

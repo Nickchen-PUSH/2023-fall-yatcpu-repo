@@ -1,0 +1,144 @@
+
+/workspaces/2023-fall-yatcpu-repo/lab2/src/main/resources/hdmi_test.asmbin:     file format binary
+
+
+Disassembly of section .data:
+
+0000000000000000 <.data>:
+       0:	00001137          	lui	sp,0x1
+       4:	00000097          	auipc	ra,0x0
+       8:	144080e7          	jalr	324(ra) # 0x148
+       c:	0000006f          	j	0xc
+      10:	00000297          	auipc	t0,0x0
+      14:	02828293          	addi	t0,t0,40 # 0x38
+      18:	30529373          	csrrw	t1,mtvec,t0
+      1c:	000022b7          	lui	t0,0x2
+      20:	88828293          	addi	t0,t0,-1912 # 0x1888
+      24:	30029373          	csrrw	t1,mstatus,t0
+      28:	00008067          	ret
+      2c:	34102573          	csrr	a0,mepc
+      30:	00008067          	ret
+      34:	00008067          	ret
+      38:	34011073          	csrw	mscratch,sp
+      3c:	f8010113          	addi	sp,sp,-128 # 0xf80
+      40:	00112223          	sw	ra,4(sp)
+      44:	00312623          	sw	gp,12(sp)
+      48:	00412823          	sw	tp,16(sp)
+      4c:	00512a23          	sw	t0,20(sp)
+      50:	00612c23          	sw	t1,24(sp)
+      54:	00712e23          	sw	t2,28(sp)
+      58:	02412023          	sw	tp,32(sp)
+      5c:	02912223          	sw	s1,36(sp)
+      60:	02a12423          	sw	a0,40(sp)
+      64:	02b12623          	sw	a1,44(sp)
+      68:	02c12823          	sw	a2,48(sp)
+      6c:	02d12a23          	sw	a3,52(sp)
+      70:	02e12c23          	sw	a4,56(sp)
+      74:	02f12e23          	sw	a5,60(sp)
+      78:	05012023          	sw	a6,64(sp)
+      7c:	05112223          	sw	a7,68(sp)
+      80:	05212423          	sw	s2,72(sp)
+      84:	05312623          	sw	s3,76(sp)
+      88:	05412823          	sw	s4,80(sp)
+      8c:	05512a23          	sw	s5,84(sp)
+      90:	05612c23          	sw	s6,88(sp)
+      94:	05712e23          	sw	s7,92(sp)
+      98:	07812023          	sw	s8,96(sp)
+      9c:	07912223          	sw	s9,100(sp)
+      a0:	07a12423          	sw	s10,104(sp)
+      a4:	07b12623          	sw	s11,108(sp)
+      a8:	07c12823          	sw	t3,112(sp)
+      ac:	07d12a23          	sw	t4,116(sp)
+      b0:	07e12c23          	sw	t5,120(sp)
+      b4:	07f12e23          	sw	t6,124(sp)
+      b8:	34102573          	csrr	a0,mepc
+      bc:	342025f3          	csrr	a1,mcause
+      c0:	00000097          	auipc	ra,0x0
+      c4:	000080e7          	jalr	ra # 0xc0
+      c8:	00412083          	lw	ra,4(sp)
+      cc:	00c12183          	lw	gp,12(sp)
+      d0:	01012203          	lw	tp,16(sp)
+      d4:	01412283          	lw	t0,20(sp)
+      d8:	01812303          	lw	t1,24(sp)
+      dc:	01c12383          	lw	t2,28(sp)
+      e0:	02012203          	lw	tp,32(sp)
+      e4:	02412483          	lw	s1,36(sp)
+      e8:	02812503          	lw	a0,40(sp)
+      ec:	02c12583          	lw	a1,44(sp)
+      f0:	03012603          	lw	a2,48(sp)
+      f4:	03412683          	lw	a3,52(sp)
+      f8:	03812703          	lw	a4,56(sp)
+      fc:	03c12783          	lw	a5,60(sp)
+     100:	04012803          	lw	a6,64(sp)
+     104:	04412883          	lw	a7,68(sp)
+     108:	04812903          	lw	s2,72(sp)
+     10c:	04c12983          	lw	s3,76(sp)
+     110:	05012a03          	lw	s4,80(sp)
+     114:	05412a83          	lw	s5,84(sp)
+     118:	05812b03          	lw	s6,88(sp)
+     11c:	05c12b83          	lw	s7,92(sp)
+     120:	06012c03          	lw	s8,96(sp)
+     124:	06412c83          	lw	s9,100(sp)
+     128:	06812d03          	lw	s10,104(sp)
+     12c:	06c12d83          	lw	s11,108(sp)
+     130:	07012e03          	lw	t3,112(sp)
+     134:	07412e83          	lw	t4,116(sp)
+     138:	07812f03          	lw	t5,120(sp)
+     13c:	07c12f83          	lw	t6,124(sp)
+     140:	34002173          	csrr	sp,mscratch
+     144:	30200073          	mret
+     148:	fe010113          	addi	sp,sp,-32
+     14c:	00112e23          	sw	ra,28(sp)
+     150:	00812c23          	sw	s0,24(sp)
+     154:	02010413          	addi	s0,sp,32
+     158:	00000513          	li	a0,0
+     15c:	fea42a23          	sw	a0,-12(s0)
+     160:	200005b7          	lui	a1,0x20000
+     164:	feb42823          	sw	a1,-16(s0)
+     168:	fea42623          	sw	a0,-20(s0)
+     16c:	0040006f          	j	0x170
+     170:	fec42583          	lw	a1,-20(s0)
+     174:	25700513          	li	a0,599
+     178:	02b54c63          	blt	a0,a1,0x1b0
+     17c:	0040006f          	j	0x180
+     180:	ff042503          	lw	a0,-16(s0)
+     184:	fec42583          	lw	a1,-20(s0)
+     188:	00259593          	slli	a1,a1,0x2
+     18c:	00b505b3          	add	a1,a0,a1
+     190:	20202537          	lui	a0,0x20202
+     194:	02050513          	addi	a0,a0,32 # 0x20202020
+     198:	00a5a023          	sw	a0,0(a1) # 0x20000000
+     19c:	0040006f          	j	0x1a0
+     1a0:	fec42503          	lw	a0,-20(s0)
+     1a4:	00150513          	addi	a0,a0,1
+     1a8:	fea42623          	sw	a0,-20(s0)
+     1ac:	fc5ff06f          	j	0x170
+     1b0:	00000513          	li	a0,0
+     1b4:	fea42423          	sw	a0,-24(s0)
+     1b8:	0040006f          	j	0x1bc
+     1bc:	fe842583          	lw	a1,-24(s0)
+     1c0:	00b00513          	li	a0,11
+     1c4:	02b54e63          	blt	a0,a1,0x200
+     1c8:	0040006f          	j	0x1cc
+     1cc:	fe842583          	lw	a1,-24(s0)
+     1d0:	00002537          	lui	a0,0x2
+     1d4:	00050513          	mv	a0,a0
+     1d8:	00a58533          	add	a0,a1,a0
+     1dc:	00050503          	lb	a0,0(a0) # 0x2000
+     1e0:	20000637          	lui	a2,0x20000
+     1e4:	00c585b3          	add	a1,a1,a2
+     1e8:	00a58023          	sb	a0,0(a1)
+     1ec:	0040006f          	j	0x1f0
+     1f0:	fe842503          	lw	a0,-24(s0)
+     1f4:	00150513          	addi	a0,a0,1
+     1f8:	fea42423          	sw	a0,-24(s0)
+     1fc:	fc1ff06f          	j	0x1bc
+     200:	0040006f          	j	0x204
+     204:	0000006f          	j	0x204
+	...
+    1000:	6568                	ld	a0,200(a0)
+    1002:	6c6c                	ld	a1,216(s0)
+    1004:	6f77206f          	j	0x73efa
+    1008:	6c72                	ld	s8,280(sp)
+    100a:	2164                	fld	fs1,192(a0)
+	...

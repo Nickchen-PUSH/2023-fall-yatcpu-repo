@@ -20,6 +20,7 @@ import chisel3.util.Cat
 import peripheral._
 import riscv.Parameters
 import riscv.core.CPU
+import riscv.ImplementationType
 
 class Top(binaryFilename: String = "say_goodbye.asmbin") extends Module {
   val io = IO(new Bundle() {
@@ -61,7 +62,7 @@ class Top(binaryFilename: String = "say_goodbye.asmbin") extends Module {
   CPU_clkdiv := CPU_next
 
   withClock(CPU_tick.asClock) {
-    val cpu = Module(new CPU)
+    val cpu = Module(new CPU(ImplementationType.ThreeStage))
     cpu.io.interrupt_flag := Cat(uart.io.signal_interrupt, timer.io.signal_interrupt)
     cpu.io.instruction_valid := rom_loader.io.load_finished
     mem.io.instruction_address := cpu.io.instruction_address

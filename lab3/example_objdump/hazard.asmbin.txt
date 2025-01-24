@@ -1,0 +1,32 @@
+
+/workspaces/2023-fall-yatcpu-repo/lab3/src/main/resources/hazard.asmbin:     file format binary
+
+
+Disassembly of section .data:
+
+0000000000000000 <.data>:
+   0:	c0002573          	rdcycle	a0
+   4:	00100293          	li	t0,1
+   8:	40500333          	neg	t1,t0
+   c:	0062f3b3          	and	t2,t0,t1
+  10:	00702223          	sw	t2,4(zero) # 0x4
+  14:	00c0006f          	j	0x20
+  18:	0062e3b3          	or	t2,t0,t1
+  1c:	0062c3b3          	xor	t2,t0,t1
+  20:	00138313          	addi	t1,t2,1
+  24:	007303b3          	add	t2,t1,t2
+  28:	007373b3          	and	t2,t1,t2
+  2c:	0023a383          	lw	t2,2(t2)
+  30:	00736e33          	or	t3,t1,t2
+  34:	01c3c663          	blt	t2,t3,0x40
+  38:	0052ee33          	or	t3,t0,t0
+  3c:	0062ce33          	xor	t3,t0,t1
+  40:	00300e93          	li	t4,3
+  44:	fdde1ee3          	bne	t3,t4,0x20
+  48:	01c02423          	sw	t3,8(zero) # 0x8
+  4c:	00000e97          	auipc	t4,0x0
+  50:	008e8ee7          	jalr	t4,8(t4) # 0x54
+  54:	004e8ee7          	jalr	t4,4(t4)
+  58:	c00025f3          	rdcycle	a1
+  5c:	40a580b3          	sub	ra,a1,a0
+  60:	0000006f          	j	0x60
